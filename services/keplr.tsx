@@ -86,7 +86,7 @@ export const connectKeplr = async () => {
           feeCurrencies: [
             {
               // Coin denomination to be displayed to the user.
-              coinDenom: my_coinDenom,// stakingDenom,
+              coinDenom: "apose",// stakingDenom,
               // Actual denom (i.e. uatom, uscrt) used by the blockchain.
               coinMinimalDenom: process.env.NEXT_PUBLIC_STAKING_DENOM,
               // # of decimal points to convert minimal denomination to user-facing denomination.
@@ -107,9 +107,9 @@ export const connectKeplr = async () => {
           // Currently, Keplr doesn't support dynamic calculation of the gas prices based on on-chain data.
           // Make sure that the gas prices are higher than the minimum gas prices accepted by chain validators and RPC/REST endpoint.
           gasPriceStep: {
-            low: 0.01,
-            average: 0.025,
-            high: 0.03,
+            low: 0.05,
+            average: 0.2,
+            high: 0.5,
           },
           features: [
             "ibc-transfer",
