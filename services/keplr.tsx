@@ -86,7 +86,7 @@ export const connectKeplr = async () => {
           feeCurrencies: [
             {
               // Coin denomination to be displayed to the user.
-              coinDenom: "apose",// stakingDenom,
+              coinDenom: "akarma",// stakingDenom,
               // Actual denom (i.e. uatom, uscrt) used by the blockchain.
               coinMinimalDenom: process.env.NEXT_PUBLIC_STAKING_DENOM,
               // # of decimal points to convert minimal denomination to user-facing denomination.

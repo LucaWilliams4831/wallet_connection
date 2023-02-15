@@ -1,7 +1,9 @@
-import { ReactNode } from 'react'
+import { ReactNode, useState } from 'react'
 import { useSigningClient } from 'contexts/cosmwasm'
 import Loader from './Loader'
 import Emoji from './Emoji'
+import Web3 from 'web3'
+import axios from "axios";
 
 function WalletLoader({
   children,
@@ -10,12 +12,15 @@ function WalletLoader({
   children: ReactNode
   loading?: boolean
 }) {
+
   const {
-    walletAddress,
+    walletAddress: addressKeplr,
     loading: clientLoading,
     error,
-    connectWallet,
+    connectWallet: connectWalletKeplr,
   } = useSigningClient()
+
+  const [addressMetamask, setAddressMetamask] = useState("");
 
   if (loading || clientLoading) {
     return (
@@ -25,7 +30,76 @@ function WalletLoader({
     )
   }
 
-  if (walletAddress === '') {
+  const registerAddress = (addr: string) => {
+    axios({
+      method: "post",
+      url: `http://3.137.200.25:5000/api/v1/account/add/${addr}`
+    }).then(res => console.log(res.message))
+      .catch(err => console.log("REGIST_ERROR", err))
+  }
+
+  const connectWallet = async () => {
+    if (!addressKeplr) connectWalletKeplr();
+    if (!addressMetamask) connectMetamask();
+  }
+
+  const connectMetamask = async () => {
+
+    if (window.ethereum) {
+      console.log(process.env.NEXT_PUBLIC_CHAIN_DD_ENDPOINT)
+      try {
+        await window.ethereum.enable();
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const walletAddress = accounts[0];
+        setAddressMetamask(accounts[0]);
+
+        const params = [{
+          chainId: process.env.NEXT_PUBLIC_CHAIN_METAMASK_ID,
+          chainName: process.env.NEXT_PUBLIC_CHAIN_NAME,
+          nativeCurrency: {
+            name: String(process.env.NEXT_PUBLIC_MAIN_DENOM).toUpperCase(),
+            symbol: String(process.env.NEXT_PUBLIC_MAIN_DENOM).toUpperCase(),
+            decimals: 18
+          },
+          rpcUrls: [process.env.NEXT_PUBLIC_CHAIN_DD_ENDPOINT],
+          // blockExplorerUrls: ['https://explorer.rsk.co']
+        }]
+
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: process.env.NEXT_PUBLIC_CHAIN_METAMASK_ID }],
+          });
+
+          registerAddress(walletAddress);
+
+        } catch (switchError) {
+          if (switchError.code === 4902) {
+            try {
+              await window.ethereum.request({
+                method: 'wallet_addEthereumChain',
+                params
+              });
+
+              registerAddress(walletAddress);
+
+            } catch (addError) {
+              console.error("MetaMask does not support adding custom RPCs.");
+            }
+          }
+          console.error("MetaMask can't switch to this RPC.");
+        }
+
+      } catch (error) {
+        console.error("User denied access to MetaMask.", error);
+      }
+    }
+    else {
+      alert('Please install MetaMask to use this feature');
+    }
+  }
+
+  if (addressKeplr === '') {
     return (
       <div className="max-w-full">
         <h1 className="text-4xl font-bold">
@@ -33,7 +107,7 @@ function WalletLoader({
         </h1>
         <h1 className="mt-4 text-6xl font-bold">
           <Emoji label="dog" symbol="🐶" />
-          <span>{' Compose Wallet Connection '}</span>
+          <span>{' Digital Dollar Wallet Connection '}</span>
           <Emoji label="dog" symbol="🐶" />
         </h1>
 
@@ -44,6 +118,12 @@ function WalletLoader({
             href="https://keplr.app/"
           >
             Keplr wallet
+          </a>,
+          <a
+            className="pl-1 link link-primary link-hover"
+            href="https://metamask.io/"
+          >
+            Metamask wallet
           </a>
         </p>
 
@@ -53,7 +133,7 @@ function WalletLoader({
             onClick={connectWallet}
           >
             <h3 className="text-2xl font-bold">
-              <span className="pr-4">Connect your wallet &rarr;</span>
+              <span className="pr-4">Complete your KYC. &rarr;</span>
               <Emoji label="poodle" symbol="🐩" />
             </h3>
           </button>
@@ -66,7 +146,17 @@ function WalletLoader({
     return <code>{JSON.stringify(error)}</code>
   }
 
-  return <>{children}</>
+  registerAddress(addressKeplr);
+
+  return (
+    <>
+      <div>
+        <h1 className="mt-4 text-2xl">Keplr Address: {addressKeplr}</h1>
+        <h1 className="mt-4 text-2xl">Metamask Address: {addressMetamask}</h1>
+      </div>
+      {children}
+    </>
+  );
 }
 
 export default WalletLoader

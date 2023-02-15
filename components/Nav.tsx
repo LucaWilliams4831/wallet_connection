@@ -36,14 +36,14 @@ function Nav() {
           </Link>
         </div>
         <ThemeToggle />
-        <div className="flex flex-grow lg:flex-grow-0 max-w-full">
+        {/* <div className="flex flex-grow lg:flex-grow-0 max-w-full">
           <button
             className="block btn btn-outline btn-primary w-full max-w-full truncate"
             onClick={handleConnect}
           >
             {walletAddress || 'Connect Wallet'}
           </button>
-        </div>
+        </div> */}
       </nav>
     </div>
   )
