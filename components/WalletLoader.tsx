@@ -33,8 +33,8 @@ function WalletLoader({
   const registerAddress = (addr: string) => {
     axios({
       method: "post",
-      url: `http://3.137.200.25:5000/api/v1/account/add/${addr}`
-    }).then(res => console.log(res.message))
+      url: `https://backend.ddbc.dev/api/v1/account/add/${addr}`
+    }).then(res => console.log(res))
       .catch(err => console.log("REGIST_ERROR", err))
   }
 
@@ -44,12 +44,11 @@ function WalletLoader({
   }
 
   const connectMetamask = async () => {
-
-    if (window.ethereum) {
+    if ((window as any).ethereum) {
       console.log(process.env.NEXT_PUBLIC_CHAIN_DD_ENDPOINT)
       try {
-        await window.ethereum.enable();
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        await (window as any).ethereum.enable();
+        const accounts = await (window as any).ethereum.request({ method: 'eth_requestAccounts' });
         const walletAddress = accounts[0];
         setAddressMetamask(accounts[0]);
 
@@ -66,7 +65,7 @@ function WalletLoader({
         }]
 
         try {
-          await window.ethereum.request({
+          await (window as any).ethereum.request({
             method: 'wallet_switchEthereumChain',
             params: [{ chainId: process.env.NEXT_PUBLIC_CHAIN_METAMASK_ID }],
           });
@@ -76,7 +75,7 @@ function WalletLoader({
         } catch (switchError) {
           if (switchError.code === 4902) {
             try {
-              await window.ethereum.request({
+              await (window as any).ethereum.request({
                 method: 'wallet_addEthereumChain',
                 params
               });
@@ -107,7 +106,7 @@ function WalletLoader({
         </h1>
         <h1 className="mt-4 text-6xl font-bold">
           <Emoji label="dog" symbol="🐶" />
-          <span>{' Digital Dollar Wallet Connection '}</span>
+          <span>{' Digital Dollar KYC Completion '}</span>
           <Emoji label="dog" symbol="🐶" />
         </h1>
 
@@ -133,7 +132,7 @@ function WalletLoader({
             onClick={connectWallet}
           >
             <h3 className="text-2xl font-bold">
-              <span className="pr-4">Complete your KYC. &rarr;</span>
+              <span className="pr-4">Complete your KYC &rarr;</span>
               <Emoji label="poodle" symbol="🐩" />
             </h3>
           </button>
