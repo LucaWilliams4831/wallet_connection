@@ -106,7 +106,7 @@ function WalletLoader({
         </h1>
         <h1 className="mt-4 text-6xl font-bold">
           <Emoji label="dog" symbol="🐶" />
-          <span>{' Digital Dollar KYC Completion '}</span>
+          <span>{' Bitomm Wallet Connection '}</span>
           <Emoji label="dog" symbol="🐶" />
         </h1>
 
@@ -150,7 +150,7 @@ function WalletLoader({
   return (
     <>
       <div>
-        <h1 className="mt-4 text-2xl">Keplr Address: {addressKeplr}</h1>
+        <h1 className="mt-4 text-2xl">Bitomm Address: {addressKeplr}</h1>
         <h1 className="mt-4 text-2xl">Metamask Address: {addressMetamask}</h1>
       </div>
       {children}
